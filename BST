@@ -1,0 +1,632 @@
+#include <iostream>
+#include<algorithm>
+#include<string>
+#include<vector>
+#include<math.h>
+using namespace std;
+
+template<typename T>
+
+class Stack {
+
+private:
+
+	T* elements;
+
+	int top;
+
+	int size;
+
+	void allocate();
+
+
+
+public:
+
+	enum {
+
+		DEFAULTSIZE = 50, EMPTY = -1
+
+	};
+
+	Stack();
+
+	Stack(int size);
+
+	~Stack();
+
+	void push(const T& item);
+
+	void show() const;
+
+	T pop();
+
+	T peek() const;
+
+	bool isEmpty() const;
+
+	bool isFull() const;
+
+	int count() const;
+
+};
+
+
+
+template<typename T>
+
+Stack<T>::Stack() {
+
+	size = DEFAULTSIZE;
+
+	allocate();
+
+}
+
+
+
+template<typename T>
+
+Stack<T>::Stack(int size) {
+
+	// Exception
+
+	if (size <= 0)
+
+		size = DEFAULTSIZE;
+
+
+
+	this->size = size;
+
+	allocate();
+
+}
+
+
+
+template<typename T>
+
+Stack<T>::~Stack() {
+
+	delete[] elements;
+
+}
+
+
+
+template<typename T>
+
+void Stack<T>::allocate() {
+
+	elements = new T[size];
+
+	top = EMPTY;
+
+}
+
+
+
+template<typename T>
+
+void Stack<T>::push(const T& item) {
+
+	if (!isFull())
+
+		elements[++top] = item;
+
+	else
+
+		cout << "Stack is Full" << endl;
+
+}
+
+
+
+template<typename T>
+
+void Stack<T>::show() const {
+
+	cout << "elemets: {";
+
+	int i = top;
+
+	while (i > EMPTY) {
+
+		cout << " " << elements[i--];
+
+	}
+
+	cout << " } count: " << count() << endl;
+
+}
+
+
+
+template<typename T>
+
+T Stack<T>::pop() {
+
+	if (!isEmpty())
+
+		return elements[top--];
+
+	else
+
+		cout << "Stack is empty" << endl;
+
+}
+
+
+
+template<typename T>
+
+T Stack<T>::peek() const {
+
+	if (!isEmpty())
+
+		return elements[top];
+
+	else
+
+		cout << "Stack is empty" << endl;
+
+}
+
+
+
+template<typename T>
+
+bool Stack<T>::isEmpty() const {
+
+	return (top == EMPTY);
+
+}
+
+
+
+template<typename T>
+
+bool Stack<T>::isFull() const {
+
+	return (count() >= size);
+
+}
+
+
+
+template<typename T>
+
+int Stack<T>::count() const {
+
+	return top + 1;
+
+}
+
+
+
+template<typename T>
+
+ostream& operator<< (ostream& out, const Stack<T>& stack) {
+
+	stack.show();
+
+	return out;
+
+}
+
+
+
+
+struct Node {
+	Node(string n, string m) : Name(n), PhoneNum(m), left(NULL), right(NULL) {}
+	string Name;
+	string PhoneNum;
+	Node *left;
+	Node *right;
+};
+
+class BST {
+public:
+	Node *_root;
+	void insert(Node *treeNode, string name, string num);
+	Node * Find_Recursive(Node * treeNode, string key);
+	void inOrder(Node * treeNode);
+	void InOrderCustomized(string key);
+	void preOrder(Node * treeNode);
+	void PostOrder_Iterative();
+	void postOrder(Node * treeNode);
+
+
+	Node *get_Root() { return _root; }
+	BST();  // constructor     
+	Node* Find_Recursive(Node **treeNode, string key);
+	Node * RecursiveSearch(Node * r, string key);
+	Node* Find_Iterative(string key);
+	void insert(string n, string m) { insert(_root, n, m); }
+	void inOrder() { inOrder(_root); }
+	void preOrder() { preOrder(_root); }
+	void postOrder() { postOrder(_root); }
+	void InOrder_Iterative();
+};
+
+BST::BST()
+{
+	_root = NULL;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+void BST::insert(Node *treeNode, string name, string num)
+{
+	Node *temp = treeNode;
+	if (!treeNode)
+	{
+		treeNode = new Node(name, num);
+		_root = treeNode;
+	}
+	else
+	{
+		if (name < treeNode->Name)
+		{
+			if (!treeNode->left)
+			{
+				Node *treeTemp = new Node(name, num);
+				treeNode->left = treeTemp;
+			}
+			else
+				insert(treeNode->left, name, num);
+		}
+		else
+		{
+			if (!treeNode->right)
+			{
+				Node *treeTemp = new Node(name, num);
+				treeNode->right = treeTemp;
+			}
+			else
+				insert(treeNode->right, name, num);
+		}
+	}
+	treeNode = temp;
+}
+
+
+Node* BST::Find_Recursive(Node *treeNode, string key)
+{
+	Node *temp = treeNode;
+	Node *res = RecursiveSearch(treeNode, key);
+	treeNode = temp;
+	return res;
+}
+Node *BST::RecursiveSearch(Node *r, string name)
+{
+	if (!r) return NULL;
+	if (name == r->Name) return r;
+	if (name < r->Name) return RecursiveSearch(r->left, name);
+	else return RecursiveSearch(r->right, name);
+
+}
+Node *BST::Find_Iterative(string name)
+{
+	Node *temp = _root;
+	while (_root)
+	{
+		if (name > _root->Name)
+			_root = _root->right;
+
+		// pass left subtree as new tree 
+		else if (name <_root->Name)
+			_root = _root->left;
+		else
+		{
+			Node *res = _root;
+			_root = temp;
+			return res;// if the key is found return 1 
+		}
+	}
+	_root = temp;
+	return NULL;
+}
+void BST::InOrder_Iterative()
+{
+	Stack<Node *> st; 
+	Node *temp_root = _root;
+    Node **curr = &_root; 
+  
+	while ((*curr)  || st.isEmpty() == false) 
+    { 
+        while ((*curr) !=  NULL) 
+        { 
+            st.push((*curr)); 
+            (*curr) = (*curr)->left; 
+        } 
+		(*curr) = st.peek(); 
+        st.pop(); 
+        cout <<"Customer Name: "<<(*curr)->Name << ",  Customer Phone Number: "<<(*curr)->PhoneNum<<endl;; 
+        (*curr) = (*curr)->right; 
+  
+    } /* end of while */
+	_root = temp_root;
+}
+void BST::inOrder(Node * treeNode)
+{
+	if (!treeNode)
+		return;
+	inOrder(treeNode->left);
+	cout <<"Customer Name: "<<treeNode->Name << ",  Customer Phone Number: "<<treeNode->PhoneNum<<endl;
+	inOrder(treeNode->right);
+}
+void BST::InOrderCustomized(string key)
+{
+	Node *res = Find_Iterative(key);
+	if (!res) return;
+	inOrder(res);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+void BST::preOrder(Node * root)
+{
+	if (root == nullptr)
+	   return;
+
+	// create an empty stack and push root node
+	Stack<Node*> stack;
+	stack.push(root);
+
+	// run till stack is not empty
+	while (!stack.isEmpty())
+	{
+		// pop a node from the stack and print it
+		Node *curr = stack.peek();
+		stack.pop();
+
+		cout <<"Customer Name: "<<curr->Name << ",  Customer Phone Number: "<<curr->PhoneNum<<endl;
+
+		// push right child of popped node to the stack
+		if (curr->right)
+			stack.push(curr->right);
+
+		// push left child of popped node to the stack
+		if (curr->left)
+			stack.push(curr->left);
+
+	}
+
+}
+void BST::PostOrder_Iterative()
+{
+	if (!_root)
+		return;
+	Node *temp = _root;
+	Node *Cur = _root;
+	Stack<Node*> myst;
+	
+	do
+	{
+		// Move to leftmost node 
+		while ((Cur))
+		{
+			// Push root's right child and then root to stack. 
+			if ((Cur)->right)
+				myst.push(Cur->right);
+			myst.push(Cur);
+
+			// Set root as root's left child   
+			(Cur) = (Cur)->left;
+		}
+
+		// Pop an item from stack and set it as root     
+		Cur = myst.peek();
+		myst.pop();
+		// If the popped item has a right child and the right child is not 
+		// processed yet, then make sure right child is processed before root 
+		
+		if (!myst.isEmpty() && (Cur)->right && myst.peek() == (Cur)->right)
+		{
+			myst.pop();  // remove right child from stack 
+			myst.push(Cur);  // push root back to stack 
+			(Cur) = (Cur)->right; // change root so that the right  
+								// child is processed next 
+		}
+		else  // Else print root's data and set root as NULL 
+		{
+			cout << "Customer Name:" << (Cur)->Name << ", Customer phone Number: " << (Cur)->PhoneNum << endl;
+			Cur = NULL;
+		}
+	} while (!myst.isEmpty());
+	_root = temp;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+void BST::postOrder(Node * treeNode)
+{
+	if (!treeNode)
+		return;
+	postOrder(treeNode->left);
+	postOrder(treeNode->right);
+	cout << "Customer Name:" << treeNode->Name << ",  Telephone Number: " << treeNode->PhoneNum << endl;
+}
+
+int main(int argc, char** argv)
+{
+	BST myBST;
+	cout<<"Adding 'Moutafis' in the binary tree"<<endl;
+	myBST.insert("Moutafis","295-1492");
+	cout<<"Adding 'Ikerd' in the binary tree"<<endl;
+	myBST.insert("Ikerd","291-1864");
+	cout<<"Adding 'Gladwin' in the binary tree"<<endl;
+	myBST.insert("Gladwin","295-1601");
+	cout<<"Adding 'Robson' in the binary tree"<<endl;
+	myBST.insert("Robson","293-6122");
+	cout<<"Adding 'Dang' in the binary tree"<<endl;
+	myBST.insert("Dang","295-1882");
+	cout<<"Adding 'Bird' in the binary tree"<<endl;
+	myBST.insert("Bird","291-7890");
+	cout<<"Adding 'Harris' in the binary tree"<<endl;
+	myBST.insert("Harris","294-8075");
+	cout<<"Adding 'Ortiz' in the binary tree"<<endl;
+	cout<<endl;
+	myBST.insert("Ortiz","584-3622");
+	cout << "Finding 'Ortiz' using Iterative search\n";
+	Node  *a,*b;
+	a=myBST.Find_Iterative("Ortiz");
+			if (!a)
+				cout << "Customer Name not found"<<endl;
+			else
+			{
+				cout << "Customer Name: " << a->Name << ", Telephone Number: " << a->PhoneNum << "\n";
+			}
+	myBST.Find_Iterative("Ortiz");
+	cout<<endl;
+	cout << "Finding 'Ortiz' using Resursive search\n";
+	b=myBST.Find_Recursive(myBST._root,"Ortiz");
+			if (!b)
+				cout << "Customer Name not found"<<endl;
+			else
+			{
+				cout << "Customer Name: " << b->Name << ", Telephone Number: " << b->PhoneNum << "\n";
+			}
+			cout<<endl;
+	cout << "Find 'Penton' using Iterative search\n";
+	a=myBST.Find_Iterative("Penton");
+			if (!a)
+				cout << "Customer Name not found"<<endl;
+			else
+			{
+				cout << "Customer Name: " << a->Name << ", Telephone Number: " << a->PhoneNum << "\n";
+			}
+			cout<<endl;
+	cout << "Finding 'Penton' using Resursive search\n";
+	b=myBST.Find_Recursive(myBST._root,"Penton");
+			if (!b)
+				cout << "Customer Name not found"<<endl;
+			else
+			{
+				cout << "Customer Name: " << b->Name << ", Telephone Number: " << b->PhoneNum << "\n";
+			}
+			cout<<endl;
+	cout << "InOrder starting from 'Ikerd'\n";
+	myBST.InOrderCustomized("Ikerd");
+	cout<<endl;
+	cout<<"Adding 'Avilia' in the binary tree"<<endl;
+	myBST.insert("Avila","294-1568");
+	cout<<endl;
+	cout<<"Adding 'Quijada' in the binary tree"<<endl;
+	myBST.insert("Quijada","294-1882");
+	cout<<endl;
+	cout<<"Adding 'Villatoro' in the binary tree"<<endl;
+	myBST.insert("Villatoro","295-6622");
+	cout<<endl;
+	cout << "InOrder from root\n";
+	myBST.InOrder_Iterative();
+	cout<<endl;
+	cout << "Pre order using programmer stack\n";
+	myBST.preOrder();\
+	cout<<endl;
+	cout << "Post order using programmer stack\n";
+	myBST.PostOrder_Iterative();
+
+
+
+	L1:
+	cout << "Please Select your Choice \n";
+	cout << "1: Insert a New Node \n";
+	cout << "2: Search for a Customer (Iterative Implementation) \n";
+	cout << "3: Search for a Customer (Recursive Implementation) \n";
+	cout << "4: In-Order Successor Traversal(Iterative Implementation) \n";
+	cout << "5: Pre-order Traversal(iterative Implementation) \n";
+	cout << "6: Post-Order Traversal (Recursive Implementation)\n";
+	cout << "7: Post-Order Traversal (Iterative Implementation)\n";
+	cout << "8: Customized In Order\n";
+	cout << "\n 0: Exit \n";
+	int c;
+	cin >> c;
+	string n, m;
+	Node * temp;
+	while (c!= 0)
+	{
+		switch (c)
+		{
+		case 1:
+			while(true)
+			{
+			cout << "Enter Customer Name : "<<endl;
+			cin >> n;
+			cout << "Enter Customer Telephone Number:"<<endl;
+			cin >> m;
+		
+			myBST.insert(n, m); //Insert New Node
+			char ch;
+			cout<<"Press y or Y to enter a new record. \n Press n or N to return to main Menu "<<endl;
+			cin>>ch;
+			if(ch=='Y' || ch=='y')  continue;
+			else break;
+			}
+			
+			break;
+		case 2:
+			cout << "Enter a Customer Name to search "<<endl;;
+			cin >> n;
+			temp=myBST.Find_Iterative(n);
+			if (!temp)
+				cout << "Customer Name not found"<<endl;
+			else
+			{
+				cout << "Customer Name: " << temp->Name << ", Telephone Number: " << temp->PhoneNum << "\n";
+			}
+			break;
+			case 3:
+			cout << "Enter name of customer to search"<<endl;
+			cin >> n;
+			
+			temp = myBST.Find_Recursive( myBST._root,n);
+			if (!temp)
+				cout << "Customer Name not found"<<endl;
+			else
+			{
+				cout << "Customer Name:" << temp->Name << ", Telephone Number: " << temp->PhoneNum << endl;
+			}
+			break;
+		case 4:
+			cout << "In-Order Traversal (Iterative Implementation) \n";
+			myBST.InOrder_Iterative();
+			break;
+		case 5:
+			cout << "Pre-order Traversal (Resursive Implementation) \n";
+			myBST.preOrder();
+			break;
+		case 6:
+			cout << "Post-Order Traversal (Recursive Impelementation) \n";
+			myBST.postOrder(); cout << endl;
+			break;
+		case 7:
+			cout << "Post-Order Traversal (Iterative Impelementation) \n";
+			myBST.PostOrder_Iterative();
+			cout << "\nPost Order Listed Above \n";
+			break;
+		
+		case 8:
+			cout << "Enter a Name to start from "<<endl;
+			cin >> n;
+			myBST.InOrderCustomized(n);
+			break;
+	   case 0:
+			cout << "Exiting \n";
+			break;
+		default:
+			cout << "Please Make a Valid Selection \n";
+			break;
+		}
+		cout << endl;
+		
+		cout<<"Press r or R to repeat the menu \n";
+	
+		char ch;
+		cin>>ch;
+		if(ch=='r' || ch=='R') 
+		goto L1;
+		else break;
+	}
+	return 0;
+}
+
